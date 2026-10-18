@@ -206,7 +206,9 @@ fn feed(mut stream: TcpStream, sink: Arc<Sink>, go: Arc<AtomicBool>, stop: Arc<A
         };
         let expected = (t0.elapsed().as_secs_f64() * bytes_per_sec) as u64;
         let expected = expected - expected % FRAME_BYTES as u64;
-        let behind_limit = (0.04 * bytes_per_sec) as u64;
+        // Sources deliver in bursts (USB interfaces, a busy capture thread); padding at the first 40 ms of
+        // lateness put a zero gap in every burst. ffmpeg times audio by sample count, so waiting is free.
+        let behind_limit = (0.25 * bytes_per_sec) as u64;
         let ahead_limit = (0.10 * bytes_per_sec) as u64;
         if sent + (chunk.len() as u64) > expected + ahead_limit {
             let allowed = (expected + ahead_limit).saturating_sub(sent) as usize;

@@ -270,7 +270,8 @@ fn capture_once(sink: &Sink, stop: &AtomicBool) -> Result<(), String> {
     let mut client = device.get_iaudioclient().map_err(|e| e.to_string())?;
     let fmt = WaveFormat::new(32, 32, &SampleType::Float, RATE as usize, 2, None);
     let (_, min_period) = client.get_device_period().map_err(|e| e.to_string())?;
-    let mode = StreamMode::EventsShared { autoconvert: true, buffer_duration_hns: min_period.max(200_000) };
+    // 200 ms of slack so the once-a-second device check cannot overrun the endpoint buffer.
+    let mode = StreamMode::EventsShared { autoconvert: true, buffer_duration_hns: min_period.max(2_000_000) };
     // For a playback device, Direction::Capture selects loopback.
     client.initialize_client(&fmt, &Direction::Capture, &mode).map_err(|e| e.to_string())?;
     let event = client.set_get_eventhandle().map_err(|e| e.to_string())?;
@@ -306,7 +307,10 @@ fn capture_once(sink: &Sink, stop: &AtomicBool) -> Result<(), String> {
         }
         // Loopback of a silent device delivers no packets, so poll on a short timeout.
         let _ = event.wait_for_event(20);
-        capture.read_from_device_to_deque(&mut scratch).map_err(|e| e.to_string())?;
+        // one read takes one packet: drain them all, or a backlog after any hiccup stays until the buffer overflows
+        while capture.get_next_packet_size().map_err(|e| e.to_string())?.unwrap_or(0) > 0 {
+            capture.read_from_device_to_deque(&mut scratch).map_err(|e| e.to_string())?;
+        }
         if scratch.is_empty() {
             sink.level.store(0, Ordering::Relaxed);
             continue;
@@ -352,39 +356,62 @@ fn capture_app_once(sink: &Sink, stop: &AtomicBool, src: &AppSource) -> Result<(
 
     let mut client = wasapi::AudioClient::new_application_loopback_client(pid, include).map_err(|e| e.to_string())?;
     let fmt = WaveFormat::new(32, 32, &SampleType::Float, RATE as usize, 2, None);
-    let mode = StreamMode::EventsShared { autoconvert: true, buffer_duration_hns: 0 };
+    let mode = StreamMode::EventsShared { autoconvert: true, buffer_duration_hns: 2_000_000 };
     client.initialize_client(&fmt, &Direction::Capture, &mode).map_err(|e| e.to_string())?;
     let event = client.set_get_eventhandle().map_err(|e| e.to_string())?;
     let capture = client.get_audiocaptureclient().map_err(|e| e.to_string())?;
     client.start_stream().map_err(|e| e.to_string())?;
     sink.set_live();
 
-    let mut scratch: VecDeque<u8> = VecDeque::new();
-    let mut last_check = Instant::now();
-    while !stop.load(Ordering::Relaxed) {
-        if sink.generation.load(Ordering::Relaxed) != generation {
-            let _ = client.stop_stream();
-            return Err("reconfigured".into());
-        }
-        if last_check.elapsed() >= Duration::from_secs(1) {
-            last_check = Instant::now();
-            let now = match src {
-                AppSource::IncludeStem(s) | AppSource::ExcludeStem(s) => crate::win::find_root_pid(s),
-                AppSource::IncludePid(p) => crate::win::pid_alive(*p).then_some(*p),
-                AppSource::None => None,
-            };
-            if now != Some(pid) {
-                let _ = client.stop_stream();
-                return Err("reconfigured".into()); // program restarted or exited
+    // Whether the program restarted or exited is checked on its own thread: the process snapshot takes tens of
+    // ms while a game runs, and the app-loopback client does not buffer that long (a 20 ms hole every second).
+    let gone = Arc::new(AtomicBool::new(false));
+    let done = Arc::new(AtomicBool::new(false));
+    {
+        let (gone, done, src) = (gone.clone(), done.clone(), src.clone());
+        thread::spawn(move || {
+            while !done.load(Ordering::Relaxed) {
+                thread::sleep(Duration::from_secs(1));
+                let now = match &src {
+                    AppSource::IncludeStem(s) | AppSource::ExcludeStem(s) => crate::win::find_root_pid(s),
+                    AppSource::IncludePid(p) => crate::win::pid_alive(*p).then_some(*p),
+                    AppSource::None => None,
+                };
+                if now != Some(pid) {
+                    gone.store(true, Ordering::Relaxed);
+                    return;
+                }
             }
+        });
+    }
+    let result = app_loop(sink, stop, generation, &gone, &event, &capture);
+    done.store(true, Ordering::Relaxed);
+    let _ = client.stop_stream();
+    result
+}
+
+fn app_loop(
+    sink: &Sink,
+    stop: &AtomicBool,
+    generation: u32,
+    gone: &AtomicBool,
+    event: &wasapi::Handle,
+    capture: &wasapi::AudioCaptureClient,
+) -> Result<(), String> {
+    let mut scratch: VecDeque<u8> = VecDeque::new();
+    while !stop.load(Ordering::Relaxed) {
+        if sink.generation.load(Ordering::Relaxed) != generation || gone.load(Ordering::Relaxed) {
+            return Err("reconfigured".into()); // settings changed, or the program restarted or exited
         }
         let _ = event.wait_for_event(20);
-        let frames = capture.get_next_packet_size().map_err(|e| e.to_string())?.unwrap_or(0);
-        if frames == 0 {
+        // one read takes one packet: drain them all, or a backlog after any hiccup stays until the buffer overflows
+        while capture.get_next_packet_size().map_err(|e| e.to_string())?.unwrap_or(0) > 0 {
+            capture.read_from_device_to_deque(&mut scratch).map_err(|e| e.to_string())?;
+        }
+        if scratch.is_empty() {
             sink.level.store(0, Ordering::Relaxed);
             continue;
         }
-        capture.read_from_device_to_deque(&mut scratch).map_err(|e| e.to_string())?;
         let bytes: Vec<u8> = scratch.drain(..).collect();
         let mut peak = 0f32;
         for s in bytes.chunks_exact(4) {
@@ -399,7 +426,6 @@ fn capture_app_once(sink: &Sink, stop: &AtomicBool, src: &AppSource) -> Result<(
             q.drain(..drop);
         }
     }
-    let _ = client.stop_stream();
     Ok(())
 }
 
