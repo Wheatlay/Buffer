@@ -162,6 +162,7 @@ fn run() {
         println!("recorder is already running");
         return;
     }
+    win::raise_priority();
     let cfg = Config::load();
     lang::set(&cfg.lang);
     overlay::set_theme(&cfg.theme);

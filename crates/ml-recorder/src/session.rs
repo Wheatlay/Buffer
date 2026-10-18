@@ -401,6 +401,11 @@ fn run_session(shared: &Arc<Shared>) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     cmd.stdout(Stdio::piped()).stderr(Stdio::from(log_file)).stdin(Stdio::null());
     ml_core::export::hide_window(&mut cmd);
+    {
+        // above normal like the recorder itself (see win::raise_priority); replaces the flags hide_window set
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x0800_0000 | 0x0000_8000); // CREATE_NO_WINDOW | ABOVE_NORMAL_PRIORITY_CLASS
+    }
 
     let mut child = cmd
         .spawn()

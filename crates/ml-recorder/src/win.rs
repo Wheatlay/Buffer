@@ -36,6 +36,15 @@ pub fn free_bytes(dir: &Path) -> Option<u64> {
     (ok != 0).then_some(free)
 }
 
+/// Raises this process to "above normal" priority. A game or a compile at full CPU otherwise starved the capture
+/// and audio threads: the frame rate fell to 5-20 fps with whole stalls, and every source got a hole at once.
+pub fn raise_priority() {
+    use windows_sys::Win32::System::Threading::{GetCurrentProcess, SetPriorityClass, ABOVE_NORMAL_PRIORITY_CLASS};
+    unsafe {
+        SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+    }
+}
+
 /// Returns false when another instance already holds the named mutex.
 /// The handle is intentionally leaked: it must live as long as the process.
 pub fn claim_single_instance(name: &str) -> bool {
