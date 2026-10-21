@@ -866,7 +866,34 @@ fn recorder_autostart(enable: Option<bool>) -> Result<bool, String> {
     Ok(recorder_cli(&["autostart-status"])? == "enabled")
 }
 
+/// The single-instance plugin only claims its mutex once Tauri is set up (hundreds of ms on a cold start), so quick
+/// repeated tray clicks used to slip past it and open several windows. This claims a mutex at the very first line; a
+/// later launch waits until the first one's plugin is ready, then the plugin hands it over to that window and exits.
+fn wait_for_first_instance() {
+    use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS};
+    use windows_sys::Win32::System::Threading::{CreateMutexW, OpenMutexW, SYNCHRONIZATION_SYNCHRONIZE};
+    let wide = |s: &str| s.encode_utf16().chain(Some(0)).collect::<Vec<u16>>();
+    unsafe {
+        let h = CreateMutexW(std::ptr::null(), 0, wide("Local\\BufferAppStart").as_ptr());
+        if h.is_null() || GetLastError() != ERROR_ALREADY_EXISTS {
+            return; // first launch: the handle stays open for the life of the process
+        }
+        CloseHandle(h);
+        // the plugin's mutex name (tauri-plugin-single-instance: "<identifier>-sim")
+        let plugin = wide("dev.wheatlay.buffer-sim");
+        for _ in 0..150 {
+            let p = OpenMutexW(SYNCHRONIZATION_SYNCHRONIZE, 0, plugin.as_ptr());
+            if !p.is_null() {
+                CloseHandle(p);
+                return;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        }
+    }
+}
+
 fn main() {
+    wait_for_first_instance();
     ml_core::paths::migrate_legacy_dirs();
     // the release build has no console: keep panics from any thread in a file next to recorder.log
     if let Some(dir) = std::env::var_os("LOCALAPPDATA").map(|b| PathBuf::from(b).join(ml_core::paths::LOCAL_DIR_NAME)) {

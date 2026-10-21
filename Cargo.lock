@@ -383,7 +383,7 @@ dependencies = [
 
 [[package]]
 name = "buffer"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "ml-core",
  "ml-eq",
@@ -399,6 +399,7 @@ dependencies = [
  "tauri-plugin-updater",
  "trash",
  "wasapi",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2305,7 +2306,7 @@ dependencies = [
 
 [[package]]
 name = "ml-cli"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "anyhow",
  "clap",
@@ -2314,7 +2315,7 @@ dependencies = [
 
 [[package]]
 name = "ml-core"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "anyhow",
  "serde",
@@ -2323,7 +2324,7 @@ dependencies = [
 
 [[package]]
 name = "ml-eq"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "flate2",
  "serde",
@@ -2333,7 +2334,7 @@ dependencies = [
 
 [[package]]
 name = "ml-fans"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "ml-core",
  "serde",
@@ -2342,7 +2343,7 @@ dependencies = [
 
 [[package]]
 name = "ml-recorder"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "ml-core",
  "ml-eq",
@@ -2358,7 +2359,7 @@ dependencies = [
 
 [[package]]
 name = "ml-rgb"
-version = "0.4.9"
+version = "0.4.10"
 dependencies = [
  "hidapi",
  "ml-core",

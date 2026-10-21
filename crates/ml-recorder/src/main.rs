@@ -270,9 +270,23 @@ fn autostart(install: bool) {
         old.args(["delete", RUN_KEY, "/v", "MomentsLiteRecorder", "/f"]);
         ml_core::export::hide_window(&mut old);
         let _ = old.output();
-        // a debug build is a console program: started at login it would open a terminal window, so it starts through a
-        // headless console host (the release build has no console and starts directly)
-        let line = if cfg!(debug_assertions) { format!("conhost.exe --headless \"{exe}\" run") } else { format!("\"{exe}\" run") };
+        // a debug build never registers itself: its buffer.exe loads the UI from the `tauri dev` server, which is not
+        // running after a reboot, so the window showed ERR_CONNECTION_REFUSED. It registers the installed copy instead.
+        let exe = if cfg!(debug_assertions) {
+            let installed = std::env::var_os("LOCALAPPDATA")
+                .map(|d| std::path::PathBuf::from(d).join("Buffer").join("buffer-recorder.exe"))
+                .filter(|p| p.is_file());
+            match installed {
+                Some(p) => p.to_string_lossy().into_owned(),
+                None => {
+                    println!("autostart change failed: dev build and no installed Buffer to start at login");
+                    return;
+                }
+            }
+        } else {
+            exe
+        };
+        let line = format!("\"{exe}\" run");
         cmd.args(["add", RUN_KEY, "/v", RUN_VALUE, "/t", "REG_SZ", "/d", &line, "/f"]);
     } else {
         cmd.args(["delete", RUN_KEY, "/v", RUN_VALUE, "/f"]);

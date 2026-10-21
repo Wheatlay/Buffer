@@ -25,6 +25,9 @@ Windows clip recorder/editor, live EQ, sound switcher and RGB control. Rust work
 - The running dev `buffer.exe` / `buffer-recorder.exe` lock `target\debug`. **Closing them (even mid-recording) is fine**: stop
   both, build in the normal target dir, start again. The dev app relaunches a quit recorder within seconds.
   `cargo build -p ml-recorder` must really replace the exe: check its timestamp, an old recorder silently lacks new commands.
+- The login autostart (`HKCU\...\Run\BufferRecorder`) must point at the INSTALLED recorder (`%LOCALAPPDATA%\Buffer`). A debug
+  one at login opens a window that needs the `tauri dev` server (ERR_CONNECTION_REFUSED after every reboot); a debug
+  `install-autostart` therefore registers the installed copy.
 - Test with the user's LIVE state in mind (they edit EQ and lights while testing): back up and restore only what a test
   changed. Hardware tests must put devices back (RGB: "Give back"; keyboard: restore its saved profile).
 - Releases: `scripts\release.ps1 -Local` (~3 min, builds here) or `scripts\release.ps1` (GitHub Actions, ~10 min). Both take
