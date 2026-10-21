@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Buffer — save the clip after it happens</title>
-<meta name="description" content="Always-on clip recorder and editor for Windows. Small on purpose: no launcher, no account, no overlay.">
+<meta name="description" content="Always-on clip recorder and editor for Windows, with live EQ, a sound switcher, RGB and fan curves. Small on purpose: no launcher, no account, no overlay.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -70,16 +70,22 @@
   <figure><img src="screenshots/editor.png" alt="Editor"><figcaption>Editor. Trim, pick a size, drag it into Discord.</figcaption></figure>
 
   <section class="features">
-    <div><h2>Always on</h2><p>Keeps the last minutes in the background. One hotkey saves what just happened.</p></div>
-    <div><h2>Three audio tracks</h2><p>Game, voice chat and microphone are saved separately, so you can mute or fix any of them later.</p></div>
-    <div><h2>Big libraries, no lag</h2><p>Thousands of clips stay smooth. Group by date and collapse or expand everything with one click.</p></div>
-    <div><h2>Live EQ, optional</h2><p>A 7-band parametric EQ for game sound and your mic, with headphone profiles and per-game presets. No added delay; it runs on the free Equalizer APO.</p></div>
-<div><h2>Sound Switcher</h2><p>A tray mixer: every device and every app's volume, scroll the icon to change it, switch output or mic on a hotkey. The EQ follows.</p></div>
-    <div><h2>RGB, optional</h2><p>Colour, brightness and effects for all your lights in one place, with a 3D model of your desk. Runs on OpenRGB, installed only if you ask.</p></div>
-    <div><h2>Fan curves, optional</h2><p>Quiet-to-Cool dials or full curves, a live view of your case and its airflow. Imports FanControl. If Buffer stops, the fans go back to the board's settings.</p></div>
-    <div><h2>Edit and export to size</h2><p>Trim, crop to 16:9, then export for Discord (10 MB), Boost (50 MB) or 500 MB and drag it in.</p></div>
+    <div><h2>Always on</h2><p>Keeps the last minutes in the background (NVENC when your GPU has it). One hotkey saves what just happened as an MP4.</p></div>
+    <div><h2>Three audio tracks</h2><p>Game, voice chat and microphone are saved separately, so you can mute or fix any of them later. Devices that disappear are picked up again, and Buffer warns you when your mic ends up in the game track.</p></div>
+    <div><h2>Big libraries, no lag</h2><p>Thousands of clips stay smooth. Sort by game or group by date, with favorites, search and bulk actions. Clips from other recorders are filed by their folder.</p></div>
+    <div><h2>Live EQ, optional</h2><p>A 7-band parametric EQ for your outputs and your mic, with presets, AutoEQ for your headphones, per-game presets and an output switch on a hotkey. No added delay; it runs on Equalizer APO, installed only if you turn the EQ on.</p></div>
+    <div><h2>Sound Switcher</h2><p>A tray mixer: every playback device and every app's volume, change the default output, scroll the icon to change volume, switch output or mic on a hotkey with a short popup. The EQ follows.</p></div>
+    <div><h2>RGB, optional</h2><p>Colour, brightness and power for your lights in one place, or a 3D/2D model of your desk with synced effects. Colour calibration, profiles and share codes. Runs on OpenRGB, installed only if you ask.</p></div>
+    <div><h2>Fan curves, optional</h2><p>Simple Quiet-to-Cool dials or Advanced curves, wiring and a case view with live speeds and airflow. Finds each fan by spinning it, imports FanControl. If Buffer stops, the fans go back to the board's settings. Needs admin approval once.</p></div>
+    <div><h2>Edit and export to size</h2><p>Trim, crop to 16:9, change speed, set volume and loudness per track on a zoomable timeline. Export for Discord (10 MB), Boost (50 MB) or 500 MB and drag it in.</p></div>
+    <div><h2>Updates itself</h2><p>Updates are checked in the background and verified against Buffer's own key.</p></div>
     <div><h2>Speaks your language</h2><p>English, Polski, Deutsch, Español, Français, Українська, Türkçe, 日本語, 简体中文.</p></div>
   </section>
+
+  <figure><img src="screenshots/eq.png" alt="Live EQ: 7-band parametric EQ with presets" onerror="this.closest('figure').style.display='none'"><figcaption>Live EQ. Seven bands, presets, one hotkey to switch output.</figcaption></figure>
+  <figure><img src="screenshots/sound-switcher.png" alt="Sound Switcher: tray mixer with per-app volume and output switching" onerror="this.closest('figure').style.display='none'"><figcaption>Sound Switcher. Every device and every app's volume.</figcaption></figure>
+  <figure><img src="screenshots/rgb.png" alt="RGB: lights of your PC on a 3D model of your desk" onerror="this.closest('figure').style.display='none'"><figcaption>RGB. All your lights on a model of your desk.</figcaption></figure>
+  <figure><img src="screenshots/fans.png" alt="Fan curves: curves and case view with live fan speeds" onerror="this.closest('figure').style.display='none'"><figcaption>Fans. Curves and a live view of your case.</figcaption></figure>
 
   <footer>
     <a class="btn" href="https://github.com/Wheatlay/Buffer/releases/latest">Download for Windows</a>
