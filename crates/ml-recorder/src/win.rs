@@ -225,6 +225,8 @@ pub struct Foreground {
     pub stem: String,
     /// The window covers its whole monitor (exclusive or borderless fullscreen).
     pub fullscreen: bool,
+    /// Window size and position, for the log ("410x625 at 2908,759").
+    pub rect: String,
     /// Index of the monitor the window is on (same order as `monitors()` / the capture index).
     pub monitor: usize,
 }
@@ -273,7 +275,8 @@ pub fn foreground() -> Option<Foreground> {
                 fullscreen = r.left <= m.left && r.top <= m.top && r.right >= m.right && r.bottom >= m.bottom;
             }
         }
-        Some(Foreground { pid, exe: path, stem, fullscreen, monitor })
+        let rect = format!("{}x{} at {},{}", r.right - r.left, r.bottom - r.top, r.left, r.top);
+        Some(Foreground { pid, exe: path, stem, fullscreen, monitor, rect })
     }
 }
 

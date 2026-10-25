@@ -151,7 +151,7 @@ pub const NEVER_GAMES: &[&str] = &[
     "explorer", "searchhost", "shellexperiencehost", "applicationframehost", "startmenuexperiencehost",
     "lockapp", "chrome", "msedge", "firefox", "opera", "brave", "vivaldi", "vlc", "mpv", "potplayer",
     "code", "devenv", "powerpnt", "winword", "excel", "buffer", "buffer-recorder", "obs64", "teams",
-    "zoom", "discord", "spotify", "slack", "steamwebhelper", "taskmgr", "mstsc", "vmware", "virtualbox",
+    "zoom", "discord", "messy", "messenger", "whatsapp", "telegram", "spotify", "slack", "steamwebhelper", "taskmgr", "mstsc", "vmware", "virtualbox",
     // screenshot tools cover the whole screen while you pick an area (Win+Shift+S)
     "snippingtool", "screenclippinghost", "screensketch", "textinputhost", "gamebar", "widgets", "searchapp",
 ];
@@ -841,6 +841,8 @@ pub fn run(shared: Arc<session::Shared>, _hotkey: String, popups: Receiver<Popup
     let mut shown: Option<State> = None;
     let mut notified: HashSet<u32> = HashSet::new();
     let mut first_seen: std::collections::HashMap<u32, std::time::Instant> = std::collections::HashMap::new();
+    // since when the active game's own window has been in front but no longer covers its monitor
+    let mut windowed_since: Option<std::time::Instant> = None;
     let mut tick = 0u32;
     let mut health = HealthWatch::new();
     let my_pid = std::process::id();
@@ -962,6 +964,10 @@ pub fn run(shared: Arc<session::Shared>, _hotkey: String, popups: Receiver<Popup
                 g.as_ref().is_some_and(|g| !win::pid_alive(g.pid))
             };
             if gone {
+                if let Some(g) = tick_shared.active_game.lock().unwrap().as_ref() {
+                    session::log(&format!("game ended: {} (pid {}) exited", g.name, g.pid));
+                }
+                windowed_since = None;
                 *tick_shared.active_game.lock().unwrap() = None;
                 apply_app_sources(&tick_shared);
                 crate::eq::on_game(&tick_shared, None, None);
@@ -971,6 +977,26 @@ pub fn run(shared: Arc<session::Shared>, _hotkey: String, popups: Receiver<Popup
                 if fg.pid != my_pid {
                     let ignored = NEVER_GAMES.contains(&fg.stem.as_str()) || cfg.ignore_apps.iter().any(|a| a == &fg.stem);
                     let forced = cfg.extra_games.iter().any(|a| a == &fg.stem);
+                    // A detected game whose own window is in front but no longer fullscreen (a chat app that showed a
+                    // photo fullscreen once) stops being a game after a while. Alt-tab away does not count: then the
+                    // game is not in front at all.
+                    let is_known = tick_shared.active_game.lock().unwrap().as_ref().is_some_and(|g| g.pid == fg.pid);
+                    if is_known && !forced && !fg.fullscreen {
+                        let since = *windowed_since.get_or_insert_with(std::time::Instant::now);
+                        if since.elapsed() >= std::time::Duration::from_secs(10) {
+                            windowed_since = None;
+                            let name = tick_shared.active_game.lock().unwrap().take().map(|g| g.name).unwrap_or_default();
+                            session::log(&format!(
+                                "game ended: {name} ({}) in front but not fullscreen for 10 s ({})",
+                                fg.stem, fg.rect
+                            ));
+                            notified.remove(&fg.pid);
+                            apply_app_sources(&tick_shared);
+                            crate::eq::on_game(&tick_shared, None, None);
+                        }
+                    } else if is_known {
+                        windowed_since = None;
+                    }
                     if !ignored && (fg.fullscreen || forced) {
                         let known = tick_shared.active_game.lock().unwrap().clone();
                         let name = session::current_game_name(&cfg);
@@ -987,6 +1013,15 @@ pub fn run(shared: Arc<session::Shared>, _hotkey: String, popups: Receiver<Popup
                                 }
                             }
                             _ => {
+                                session::log(&format!(
+                                    "game detected: {name} ({}, pid {}) {} on monitor {} ({})",
+                                    fg.stem,
+                                    fg.pid,
+                                    if forced { "added by hand" } else { "fullscreen" },
+                                    fg.monitor,
+                                    fg.rect
+                                ));
+                                windowed_since = None;
                                 *tick_shared.active_game.lock().unwrap() =
                                     Some(ActiveGame { pid: fg.pid, name: name.clone(), monitor: fg.monitor });
                                 apply_app_sources(&tick_shared);

@@ -142,6 +142,14 @@ impl Shared {
     }
 }
 
+/// What is in front right now, for stall messages: "messy 410x625 at 2908,759" or "nothing (lock screen, UAC prompt)".
+fn foreground_note() -> String {
+    match crate::win::foreground() {
+        Some(f) => format!("{} {}{}", f.stem, f.rect, if f.fullscreen { " fullscreen" } else { "" }),
+        None => "nothing readable (desktop, lock screen or a UAC prompt)".into(),
+    }
+}
+
 pub fn log(msg: &str) {
     let _ = fs::create_dir_all(log_path().parent().unwrap());
     if let Ok(mut f) = OpenOptions::new().create(true).append(true).open(log_path()) {
@@ -547,6 +555,7 @@ fn run_session(shared: &Arc<Shared>) -> Result<(), String> {
         }
         if started.elapsed() > Duration::from_secs(20) && last_progress.elapsed() > Duration::from_secs(15) {
             finish(&mut child, &stop);
+            log(&format!("no ffmpeg output; in front: {}", foreground_note()));
             return Err("ffmpeg stopped producing output".into());
         }
         // The segment check above is fooled when only the picture dies: the audio inputs keep every segment fresh.
@@ -555,6 +564,7 @@ fn run_session(shared: &Arc<Shared>) -> Result<(), String> {
         let n = frames.load(Ordering::Relaxed);
         if started.elapsed() > Duration::from_secs(20) && video.stalled(n, Instant::now(), VIDEO_STALL) {
             finish(&mut child, &stop);
+            log(&format!("capture stalled; in front: {}", foreground_note()));
             return Err(format!("video capture stalled at frame {n}"));
         }
         thread::sleep(Duration::from_millis(250));
