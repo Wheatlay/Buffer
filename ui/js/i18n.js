@@ -6,6 +6,16 @@
 App.locales = {};
 App.i18n = (function () {
   const ORDER = ["en", "pl", "de", "es", "fr", "uk", "tr", "ja", "zh"];
+  // what the language list needs without loading every locale file (keep in step with js/locales/<code>.js)
+  const META = {
+    en: { name: "English", tag: "en-US", ai: true }, pl: { name: "Polski", tag: "pl-PL", ai: false },
+    de: { name: "Deutsch", tag: "de-DE", ai: true }, es: { name: "Español", tag: "es-ES", ai: true },
+    fr: { name: "Français", tag: "fr-FR", ai: true }, uk: { name: "Українська", tag: "uk-UA", ai: true },
+    tr: { name: "Türkçe", tag: "tr-TR", ai: true }, ja: { name: "日本語", tag: "ja-JP", ai: true },
+    zh: { name: "简体中文", tag: "zh-CN", ai: true },
+  };
+  // only English ships in index.html; the UI language (and a suggested one) load in init
+  const load = (code) => (code === "en" || !META[code] ? Promise.resolve() : App.loadScripts([`js/locales/${code}.js`]).catch(() => {}));
   let lang = "en";
   let auto = false;          // the language was taken from Windows on first run (the wizard then offers English)
   const rules = {};
@@ -46,8 +56,8 @@ App.i18n = (function () {
     st.textContent = faces.join("\n");
   }
 
-  /** Picks the UI language (call once after the saved state is loaded). */
-  function init() {
+  /** Picks the UI language and loads its texts (call once after the saved state is loaded). */
+  async function init() {
     const s = App.P.settings;
     // first run (the wizard not finished, no language ever picked or dismissed): start in the OS language when we have it,
     // so a Polish Windows opens in Polish. A choice made with setLang (or the hint's ✕) sets langHint and is kept.
@@ -57,7 +67,10 @@ App.i18n = (function () {
       auto = d !== "en";
     }
     const want = s.lang;
+    await load(want);
     lang = App.locales[want] ? want : "en";
+    const sug = suggestion();
+    if (sug) await load(sug);
     document.documentElement.lang = App.locales[lang].tag;   // also makes CSS uppercase right for Turkish
     installFonts(lang);
   }
@@ -69,7 +82,7 @@ App.i18n = (function () {
       const base = tag.split("-")[0];
       if (base === "en") return null;
       if (base === "zh" && /tw|hk|mo|hant/.test(tag)) continue;   // we only have Simplified Chinese
-      if (App.locales[base]) return base;
+      if (META[base]) return base;
     }
     return null;
   }
@@ -103,9 +116,9 @@ App.i18n = (function () {
     const h = App.h;
     return h("div", { class: "langhint inline" },
       h("button", { class: "linkbtn lime", text: App.tIn(code, "lang.switchTo"), onClick: () => setLang(code) }),
-      App.locales[code].ai ? h("span", { class: "muted", title: App.tIn(code, "lang.aiTip"), text: App.tIn(code, "lang.ai") }) : null,
+      META[code].ai ? h("span", { class: "muted", title: App.tIn(code, "lang.aiTip"), text: App.tIn(code, "lang.ai") }) : null,
       // started in a machine-translated Windows language: say so, as the link did before
-      auto && App.locales[lang].ai ? h("span", { class: "muted", title: App.t("lang.aiTip"), text: App.t("lang.ai") }) : null,
+      auto && META[lang].ai ? h("span", { class: "muted", title: App.t("lang.aiTip"), text: App.t("lang.ai") }) : null,
       h("button", { class: "linkbtn", text: "✕", onClick: (e) => { dismissHint(); e.currentTarget.parentElement.remove(); onDone?.(); } }));
   }
 
@@ -114,11 +127,11 @@ App.i18n = (function () {
     const code = auto ? null : suggestion();         // the wizard's link offers English; no chip on top of it
     if (!code) return null;
     const h = App.h;
-    const L = App.locales[code];
+    const L = META[code];
     return h("div", { class: "langchip", title: L.ai ? App.tIn(code, "lang.aiTip") : "" },
       h("button", { class: "go", text: "🌐 " + App.tIn(code, "lang.switchTo"), onClick: () => setLang(code) }),
       h("button", { class: "x", text: "✕", "aria-label": App.t("common.dismiss"), onClick: (e) => { dismissHint(); e.currentTarget.parentElement.remove(); } }));
   }
 
-  return { ORDER, init, detect, suggestion, setLang, hintLink, topbarChip, current: () => lang };
+  return { ORDER, META, init, detect, suggestion, setLang, hintLink, topbarChip, current: () => lang };
 })();

@@ -392,6 +392,7 @@ App.locales.tr = { name: "Türkçe", tag: "tr-TR", ai: true, t: {
   "lib.count": { one: "{n} klip", other: "{n} klip" },
   "lib.loadFail": "Kütüphane yüklenemiyor",
   "lib.none": "Klip yok",
+  "lib.loading": "Klipler yükleniyor…",
   "lib.noMatch": "Bu görünümde eşleşen yok.",
   "lib.empty": "Kütüphane klasörlerinde henüz klip yok.",
   "lib.clearFilters": "Filtreleri temizle",

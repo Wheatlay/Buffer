@@ -100,7 +100,7 @@ fn sound_for(event: Event) -> Sound {
     match event {
         Event::PostRoll { .. } | Event::Saved => Sound::Saved,
         Event::SaveFailed | Event::RecordingDown | Event::GameWarn => Sound::Failed,
-        Event::Game => Sound::Game,
+        Event::Game | Event::Update => Sound::Game,
     }
 }
 

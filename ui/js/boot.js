@@ -2,14 +2,20 @@
 /* Start-up: load persisted state, theme, library, recorder polling, global keys. */
 
 (async function boot() {
-  await App.loadPersisted();
+  // independent start-up questions go out together; the window stays hidden until the first screen is drawn
+  const [, clipsHome, isDev, first] = await Promise.all([
+    App.loadPersisted(),
+    App.api.invoke("default_clips_dir").catch(() => ""),
+    App.api.invoke("is_dev_build").catch(() => false),
+    App.api.invoke("startup_view").catch(() => null),
+  ]);
   // %USERPROFILE%\Videos\Buffer: where a fresh install saves clips, and the export folder's fallback
-  App.clipsHome = await App.api.invoke("default_clips_dir").catch(() => "");
+  App.clipsHome = clipsHome;
   // First launch on this machine: library = the default clips folder.
   if (App.fresh) App.P.libDirs = [App.clipsHome].filter(Boolean);
-  App.isDev = await App.api.invoke("is_dev_build").catch(() => false);
+  App.isDev = isDev;
   if (App.isDev) document.title = "Buffer (dev)";
-  App.i18n.init();
+  await App.i18n.init();
   App.applyTheme();
   App.renderNav();
 
@@ -43,14 +49,18 @@
 
   App.Rec.start();
   App.Update.start();
-  await App.Lib.load();
   // launched for a page (the tray flyout's "open" button runs `buffer.exe --view=snd`)
   const VIEWS_OK = ["lib", "eq", "snd", "rgb", "fans", "set"];
-  const first = await App.api.invoke("startup_view").catch(() => null);
-  App.go(VIEWS_OK.includes(first) ? first : "lib");
+  const view = VIEWS_OK.includes(first) ? first : "lib";
+  if (view === "rgb" || view === "fans") await App.loadHw();
+  App.go(view);
   App.api.listen("open-view", (e) => { if (VIEWS_OK.includes(e.payload)) App.go(e.payload); });
-  // the window starts hidden; show it now that the first screen is there (the host shows it after 4 s anyway)
+  // the window starts hidden; show it with the page drawn (the host shows it after 4 s anyway). The clip list fills in
+  // right after: walking big clip folders must not keep the window away.
   requestAnimationFrame(() => App.api.invoke("show_main_window").catch(() => {}));
+  await App.Lib.load();
+  // RGB and Fans are not needed for the first screen: fetch them once the app is idle, so their first open is instant
+  requestIdleCallback(() => App.loadHw().catch(() => {}), { timeout: 5000 });
   App.Exports.autoClean();            // only does anything when "Delete old exports" is set
 
   // First run: walk the user through the settings that matter.

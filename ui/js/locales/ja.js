@@ -392,6 +392,7 @@ App.locales.ja = { name: "日本語", tag: "ja-JP", ai: true, t: {
   "lib.count": { other: "{n} 件のクリップ" },
   "lib.loadFail": "ライブラリを読み込めません",
   "lib.none": "クリップなし",
+  "lib.loading": "クリップを読み込み中…",
   "lib.noMatch": "条件に一致するものがありません。",
   "lib.empty": "ライブラリフォルダにクリップがまだありません。",
   "lib.clearFilters": "フィルターを解除",

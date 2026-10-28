@@ -392,6 +392,7 @@ App.locales.en = { name: "English", tag: "en-US", ai: true, t: {
   "lib.count": { one: "{n} clip", other: "{n} clips" },
   "lib.loadFail": "Can't load the library",
   "lib.none": "No clips",
+  "lib.loading": "Loading clips…",
   "lib.noMatch": "Nothing matches this view.",
   "lib.empty": "No clips in the library folders yet.",
   "lib.clearFilters": "Clear filters",

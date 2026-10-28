@@ -443,6 +443,9 @@ body { color: var(--text); }
 .card.fresh { border-color: var(--acc); }
 .card .now { position: absolute; left: 36px; top: 9px; background: var(--acc); color: #111; font: 700 9.5px/1 "JetBrains Mono", monospace;
   padding: 3px 6px; border-radius: 4px; }
+.libload { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 90px 0; color: var(--muted); font-size: 13px; animation: fadeUp .3s var(--ease) .3s both; }
+.libload .bar { width: 160px; height: 4px; border-radius: 2px; background: #ffffff14; overflow: hidden; }
+.libload .bar i { display: block; height: 100%; background: var(--acc); animation: wipe 1.1s ease-in-out infinite; }
 .empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 70px 0; }
 .empty .lines { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
 .empty .l { display: flex; gap: 3px; align-items: center; }

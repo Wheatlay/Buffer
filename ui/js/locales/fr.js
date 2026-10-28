@@ -392,6 +392,7 @@ App.locales.fr = { name: "Français", tag: "fr-FR", ai: true, t: {
   "lib.count": { one: "{n} clip", many: "{n} clips", other: "{n} clips" },
   "lib.loadFail": "Impossible de charger la bibliothèque",
   "lib.none": "Aucun clip",
+  "lib.loading": "Chargement des clips…",
   "lib.noMatch": "Rien ne correspond à cette vue.",
   "lib.empty": "Aucun clip dans les dossiers pour l'instant.",
   "lib.clearFilters": "Effacer les filtres",

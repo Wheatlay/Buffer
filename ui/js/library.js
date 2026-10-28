@@ -224,11 +224,12 @@
 
   Lib.renderSide = () => {
     if (!els.side) return;
+    const listed = Lib._sig !== undefined;           // before the first listing a count would read "0"
     const item = (key, label, count, extra = {}) =>
       h("div", { class: "row" + (S.cat === key ? " on" : ""), onClick: () => { S.cat = key; Lib.render(false); } },
         extra.game ? gameThumb(extra.game) : null,
         extra.dot ? h("span", { class: "ci", style: { background: extra.dot } }) : null,
-        h("span", { class: "nm", text: label }), h("span", { class: "n", text: count }));
+        h("span", { class: "nm", text: label }), h("span", { class: "n", text: listed ? count : "" }));
     const recentCut = recentCutoff();
     // the five biggest games; the "Games" caption opens the full list. An opened game outside the top five stays visible.
     const GAMES_SHOWN = 5;
@@ -259,7 +260,7 @@
   function renderToolbar() {
     const titles = { all: App.t("cat.allClips"), recent: App.t("cat.recent"), fav: App.t("cat.fav"), exp: App.t("cat.exp") };
     els.title.textContent = titles[S.cat] || S.cat.slice(2);
-    els.count.textContent = App.t("lib.count", { n: Lib.visible().length });
+    els.count.textContent = Lib._sig === undefined ? "" : App.t("lib.count", { n: Lib.visible().length });
     els.thumbSeg.replaceChildren(...["S", "M", "L"].map((k) =>
       h("button", { class: App.P.settings.thumb === k ? "on" : "", text: k,
         onClick: () => { App.P.settings.thumb = k; App.persist(); renderToolbar(); layoutGrid(true); } })));
@@ -359,8 +360,11 @@
 
     if (!list.length) {
       els.spacer.style.height = "0px";
+      // the window is shown before the first listing arrives: no "no clips" message until it has
       const filtered = !!S.q || S.cat !== "all";
-      els.spacer.replaceChildren(App.emptyState(
+      // (the bar fades in after 300 ms, so a quick listing never flashes it)
+      if (Lib._sig === undefined) els.spacer.replaceChildren(h("div", { class: "libload" }, h("div", { class: "bar" }, h("i")), h("span", { text: App.t("lib.loading") })));
+      else els.spacer.replaceChildren(App.emptyState(
         S.listError ? App.t("lib.loadFail") : App.t("lib.none"),
         S.listError || (S.clips.length ? App.t("lib.noMatch") : App.t("lib.empty")),
         filtered ? App.t("lib.clearFilters") : null,
@@ -371,7 +375,7 @@
       updateFold();
       return;
     }
-    els.spacer.querySelector(":scope > .empty")?.remove();
+    els.spacer.querySelector(":scope > .empty, :scope > .libload")?.remove();
 
     const lay = reuse ? laid.lay : layout(list, g);
     laid = { list, lay, cols: g.cols, cardW: g.cardW };

@@ -358,6 +358,24 @@ const App = {};
     return svg;
   };
 
+  /** Loads scripts after start-up, run in the given order; each path is fetched only once. */
+  const loaded = new Map();
+  App.loadScripts = (paths) => Promise.all(paths.map((p) => {
+    if (!loaded.has(p)) {
+      loaded.set(p, new Promise((res, rej) => {
+        const s = Object.assign(document.createElement("script"), { src: p, async: false });
+        s.onload = res;
+        s.onerror = () => { loaded.delete(p); rej(new Error("failed to load " + p)); };
+        document.body.append(s);
+      }));
+    }
+    return loaded.get(p);
+  }));
+
+  /** RGB and Fans share code (the fan stage draws with the RGB scene), so they load together, on first use. */
+  const HW = ["rgb-wheel", "rgb-auto", "rgb", "rgb-adv", "rgb-calib", "fans", "fans-air", "fans-stage", "fans-wizard", "fans-adv"];
+  App.loadHw = () => App.loadScripts(HW.map((n) => `js/${n}.js`));
+
   /** Run async jobs with a concurrency cap; later calls can be cancelled while still queued. */
   App.queue = (limit) => {
     const waiting = [];

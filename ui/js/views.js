@@ -11,6 +11,10 @@
   App.go = (view) => {
     if (view === "exp") view = "lib";                       // the standalone exports page is gone
     if (view === "ed" && !App.Ed.current()) view = "lib";
+    if ((view === "rgb" || view === "fans") && !App.Fans) {
+      App.loadHw().then(() => App.go(view), (e) => App.toast(String(e), "err"));
+      return;
+    }
     if (S.view === "ed" && view !== "ed") App.Ed.leave();
     if (S.view === "eq" && view !== "eq") App.EQ.leave();
     if (S.view === "snd" && view !== "snd") App.Sound.leave();
@@ -745,8 +749,8 @@
     const cur = App.i18n.current();
     const langRow = U.srow(App.t("lang.label"), h("div", { class: "pathrow" },
       h("select", { class: "field", onChange: (e) => App.i18n.setLang(e.target.value) },
-        App.i18n.ORDER.filter((c) => App.locales[c]).map((c) => h("option", { value: c, text: App.locales[c].name, selected: c === cur }))),
-      App.locales[cur].ai ? h("span", { class: "muted", style: { fontSize: "12px", whiteSpace: "nowrap" }, title: App.t("lang.aiTip"), text: App.t("lang.ai") }) : null));
+        App.i18n.ORDER.map((c) => h("option", { value: c, text: App.i18n.META[c].name, selected: c === cur }))),
+      App.i18n.META[cur].ai ? h("span", { class: "muted", style: { fontSize: "12px", whiteSpace: "nowrap" }, title: App.t("lang.aiTip"), text: App.t("lang.ai") }) : null));
     const animRow = U.trow(App.t("app.anim"), App.t("app.animD"), s.anim, (on) => { s.anim = on; App.persist(); App.applyTheme(); Settings.render(); });
     const blocks = App.RecUI.generalBlocks([langRow, animRow]);
     pane.append(h("div", { class: "setcol" },

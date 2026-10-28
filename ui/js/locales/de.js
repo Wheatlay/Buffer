@@ -392,6 +392,7 @@ App.locales.de = { name: "Deutsch", tag: "de-DE", ai: true, t: {
   "lib.count": { one: "{n} Clip", other: "{n} Clips" },
   "lib.loadFail": "Bibliothek nicht ladbar",
   "lib.none": "Keine Clips",
+  "lib.loading": "Clips werden geladen…",
   "lib.noMatch": "Nichts passt zu dieser Ansicht.",
   "lib.empty": "Noch keine Clips in den Ordnern.",
   "lib.clearFilters": "Filter löschen",

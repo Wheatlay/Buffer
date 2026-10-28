@@ -21,6 +21,7 @@ mod fans;
 mod rgb;
 mod session;
 mod tray;
+mod update;
 mod win;
 
 use audio::{spawn_capture, Kind, Sink};
@@ -236,6 +237,7 @@ fn run() {
     }
 
     perf::start(shared.clone());
+    update::start(shared.clone());
 
     // Tray icon + global hotkey share one message-loop thread.
     let ui_shared = shared.clone();

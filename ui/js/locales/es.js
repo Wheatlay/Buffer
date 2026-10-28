@@ -392,6 +392,7 @@ App.locales.es = { name: "Español", tag: "es-ES", ai: true, t: {
   "lib.count": { one: "{n} clip", many: "{n} clips", other: "{n} clips" },
   "lib.loadFail": "No se puede cargar la biblioteca",
   "lib.none": "Sin clips",
+  "lib.loading": "Cargando clips…",
   "lib.noMatch": "Nada coincide con esta vista.",
   "lib.empty": "Aún no hay clips en las carpetas.",
   "lib.clearFilters": "Quitar filtros",

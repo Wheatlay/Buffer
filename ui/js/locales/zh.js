@@ -392,6 +392,7 @@ App.locales.zh = { name: "简体中文", tag: "zh-CN", ai: true, t: {
   "lib.count": { other: "{n} 个片段" },
   "lib.loadFail": "无法加载媒体库",
   "lib.none": "没有片段",
+  "lib.loading": "正在加载片段…",
   "lib.noMatch": "没有符合当前视图的内容。",
   "lib.empty": "媒体库文件夹中还没有片段。",
   "lib.clearFilters": "清除筛选",

@@ -392,6 +392,7 @@ App.locales.uk = { name: "Українська", tag: "uk-UA", ai: true, t: {
   "lib.count": { one: "{n} кліп", few: "{n} кліпи", many: "{n} кліпів", other: "{n} кліпу" },
   "lib.loadFail": "Не вдалося завантажити бібліотеку",
   "lib.none": "Немає кліпів",
+  "lib.loading": "Завантаження кліпів…",
   "lib.noMatch": "Нічого не знайдено.",
   "lib.empty": "У папках бібліотеки ще немає кліпів.",
   "lib.clearFilters": "Скинути фільтри",

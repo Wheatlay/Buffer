@@ -39,6 +39,8 @@ pub enum Event {
     Saved,
     SaveFailed,
     RecordingDown,
+    /// A newer Buffer is out (the recorder checks the release feed; the app installs it).
+    Update,
 }
 
 impl Event {
@@ -59,6 +61,7 @@ impl Event {
             // the live countdown (3 2 1 0), then a moment for the save to finish and the card to turn into "saved"
             Event::PostRoll { roll_ms } => roll_ms as f64 + 2500.0,
             Event::SaveFailed | Event::RecordingDown => 6500.0,
+            Event::Update => 8000.0,
             _ => 4000.0,
         }
     }

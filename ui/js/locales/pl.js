@@ -392,6 +392,7 @@ App.locales.pl = { name: "Polski", tag: "pl-PL", ai: false, t: {
   "lib.count": { one: "{n} klip", few: "{n} klipy", many: "{n} klipów", other: "{n} klipu" },
   "lib.loadFail": "Nie można wczytać biblioteki",
   "lib.none": "Brak klipów",
+  "lib.loading": "Wczytywanie klipów…",
   "lib.noMatch": "Nic nie pasuje do tego widoku.",
   "lib.empty": "W folderach biblioteki nie ma jeszcze klipów.",
   "lib.clearFilters": "Wyczyść filtry",
