@@ -1,7 +1,7 @@
 {
   "name": "buffer",
   "private": true,
-  "version": "0.4.13",
+  "version": "0.4.14",
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build"
