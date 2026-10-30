@@ -19,7 +19,10 @@ if ($Ask -and -not $DryRun) {
 
 function Fail($msg) { Write-Host ""; Write-Host "NOT RELEASED: $msg" -ForegroundColor Red; exit 1 }
 function Invoke-Git([string[]]$a) {
-    & git @a
+    # git writes progress to stderr; with "Stop" PowerShell 5.1 turns that into an error when stderr is redirected
+    # (2>&1, a pipe), so judge git only by its exit code
+    $ErrorActionPreference = "Continue"
+    & git @a 2>&1 | ForEach-Object { "$_" }
     if ($LASTEXITCODE -ne 0) { Fail "git $($a -join ' ') failed (exit $LASTEXITCODE). Nothing was tagged after this point." }
 }
 function Check($ok, $label, $detail = "") {
