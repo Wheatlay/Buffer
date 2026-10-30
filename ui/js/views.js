@@ -65,6 +65,25 @@
   }
   const navAway = (e) => { if (navMenuEl && !navMenuEl.contains(e.target)) closeNavMenu(); };
   const navEsc = (e) => { if (e.key === "Escape") closeNavMenu(); };
+  /** A small right-click menu at the pointer; `items` are [label, action, extraClass?] or "-" for a divider. */
+  App.ctxMenu = (e, items) => {
+    e.preventDefault();
+    closeNavMenu();
+    const kids = items.map((it) => (it === "-" ? h("hr") :
+      h("button", { class: it[2] || "", onClick: () => { closeNavMenu(); it[1](); } }, it[0])));
+    if (!kids.length) return;
+    navMenuEl = h("div", { class: "eqmenu navmenu", style: { left: `${e.clientX}px`, top: `${e.clientY}px` } }, kids);
+    document.body.append(navMenuEl);
+    const r = navMenuEl.getBoundingClientRect();
+    if (r.bottom > innerHeight - 8) navMenuEl.style.top = `${innerHeight - r.height - 8}px`;
+    if (r.right > innerWidth - 8) navMenuEl.style.left = `${innerWidth - r.width - 8}px`;
+    setTimeout(() => {
+      document.addEventListener("pointerdown", navAway, true);
+      document.addEventListener("keydown", navEsc, true);
+      window.addEventListener("blur", closeNavMenu);
+    });
+  };
+
   /** Right click on a sidebar item: hide it (modules only) and bring back the hidden ones. */
   function navMenu(e, view) {
     e.preventDefault();

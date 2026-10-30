@@ -443,7 +443,16 @@
 
   function createCard(clip) {
     const el = h("div", { class: "card", onClick: () => App.Ed.open(clip.path),
-      onContextmenu: (e) => { e.preventDefault(); api.invoke("reveal", { path: clip.path }); } });
+      // right click: menu; middle click: show in Explorer
+      onContextmenu: (e) => App.ctxMenu(e, [
+        [App.t("det.edit"), () => App.Ed.open(clip.path)],
+        [App.t("det.quick", { target: `${App.P.settings.defTarget === 10 ? "Discord " : ""}${App.P.settings.defTarget} MB` }), () => App.Exports.quick(clip.path)],
+        [(isFav(clip) ? "★ " : "☆ ") + App.t("cat.fav"), () => Lib.toggleFav(clip.path), isFav(clip) ? "on" : ""],
+        [App.t("det.reveal"), () => api.invoke("reveal", { path: clip.path })],
+        "-",
+        [App.t("common.delete"), () => Lib.remove([clip.path]), "danger"]]),
+      onMousedown: (e) => { if (e.button === 1) e.preventDefault(); },
+      onAuxclick: (e) => { if (e.button === 1) { e.preventDefault(); api.invoke("reveal", { path: clip.path }); } } });
     if (animBudget > 0) animBudget--; else el.style.animation = "none";
     el.append(
       h("div", { class: "th" },

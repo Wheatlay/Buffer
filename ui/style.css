@@ -943,6 +943,7 @@ body:has(#pop .popover) #updpop .updpopover { right: 372px; }
 .eqmenu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 10px; border-radius: 7px; text-align: left; font-size: 12.5px; }
 .eqmenu button:hover { background: var(--line); }
 .eqmenu button.on { color: var(--acc); }
+.eqmenu button.danger { color: var(--danger); }
 .eqmenu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
 .shape { width: 22px; height: 12px; flex: none; border-bottom: 1.5px solid currentColor; position: relative; opacity: .8; }
 .shape.s-peak { border: 0; background: radial-gradient(ellipse 30% 90% at 50% 100%, currentColor 0 48%, transparent 52%); }
