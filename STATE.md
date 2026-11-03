@@ -250,7 +250,17 @@ scan bars, the animated logo, the tokens. Read it before adding a screen.
 - `win::pump_messages` reports only thread timers (`hwnd == null`): window timers (the flyout, tray-icon's hover
   tracking) belong to their windows and used to be taken for the 500 ms tick.
 - Output shortcut: `output_cycle` (endpoint ids, the "Shortcut" chip on each SoundSwitcher card) limits the cycle; empty = all
-  outputs minus a separate chat device. A chosen device that is unplugged is skipped, never replaced.
+  outputs minus a separate chat device. A chosen device that is unplugged is skipped, never replaced. Playing on a
+  device outside the cycle, the shortcut goes to the cycle's first one (even a cycle of one); with nowhere to go it
+  shows "Nothing to switch to" instead of doing nothing.
+- Replaced output ids (`heal.rs`): Windows can give a device a new endpoint id without an unplug (KB5127936 did it to
+  "Arctis 5 Game" on 03.11.2026, its Chat half kept its id). The recorder remembers every output's name in
+  `outputs-seen.json` and, every 5 s, moves a referenced id that is gone (cycle, hidden, EQ channel) to the ONE output
+  with that name never seen before; the move is remembered, so a stale copy the app writes back is fixed again. EQ
+  then needs APO attached to the new id (the EQ page's attach chip, one UAC).
+- Icon rail marks from `status.nav` (recorder, cached 5 s): `warn` = amber dot (EQ: APO not on the output that plays;
+  SoundSwitcher: the switch shortcut has nowhere to go), `off` = greyed (EQ without APO, RGB without OpenRGB, Fans
+  without the helper). The reason is the item's tooltip; the lime "new" dot gives way to the amber one.
 - Device order (flyout and page): default output, the chat (communications) device, devices with apps, the rest;
   by name inside each group.
 - App page SoundSwitcher (`ui/js/sound.js`, rail label "Sound\nSwitcher"): the same mixer through `mix-get|mix-set|mix-default|mix-icon`

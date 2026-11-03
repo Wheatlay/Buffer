@@ -12,6 +12,38 @@ use std::{
     thread,
 };
 
+/// What the app's icon rail marks: `warn` = a dot (the page has something to fix), `off` = greyed (the module's
+/// own part is not installed). Re-read at most every 5 s: the UI polls status often and these touch the registry,
+/// the device list and schtasks.
+fn nav_status(shared: &Shared) -> serde_json::Value {
+    use std::sync::{Mutex, OnceLock};
+    use std::time::{Duration, Instant};
+    static CACHE: OnceLock<Mutex<Option<(Instant, serde_json::Value)>>> = OnceLock::new();
+    let mut c = CACHE.get_or_init(|| Mutex::new(None)).lock().unwrap();
+    if let Some((_, v)) = c.as_ref().filter(|(t, _)| t.elapsed() < Duration::from_secs(5)) {
+        return v.clone();
+    }
+    let (hotkey, chosen, hidden) = {
+        let c = shared.cfg.lock().unwrap();
+        (c.output_hotkey.clone(), c.output_cycle.clone(), c.hidden_outputs.clone())
+    };
+    let cur = crate::endpoints::default_output().unwrap_or_default();
+    let apo = ml_eq::apo::status();
+    // EQ: Equalizer APO is there but not on the output that plays now (a replaced endpoint id, a new device)
+    let eq_warn = apo.installed && !cur.is_empty() && !ml_eq::apo::attached(&apo, &cur);
+    // SoundSwitcher: a shortcut is set but has nowhere to go
+    let snd_warn = !hotkey.is_empty() && {
+        let list = crate::endpoints::cycle_list(crate::endpoints::outputs(), &cur, crate::endpoints::default_comms_output().as_deref(), &chosen, &hidden);
+        crate::endpoints::next_in_cycle(&list, &cur).is_none()
+    };
+    let v = json!({
+        "warn": { "eq": eq_warn, "snd": snd_warn },
+        "off": { "eq": !apo.installed, "rgb": !ml_rgb::install::installed(), "fans": !ml_fans::install::installed() },
+    });
+    *c = Some((Instant::now(), v.clone()));
+    v
+}
+
 pub fn status_json(shared: &Shared) -> serde_json::Value {
     let cfg = shared.cfg.lock().unwrap().clone();
     let sources: Vec<_> = shared
@@ -73,6 +105,7 @@ pub fn status_json(shared: &Shared) -> serde_json::Value {
         // what the top bar's EQ pill shows: the EQ is on, and Equalizer APO is there to do the work
         "eq_on": shared.eq_on.load(Ordering::Relaxed),
         "eq_apo": crate::eq::apo_installed(),
+        "nav": nav_status(shared),
         "long": {
             "active": crate::longrec::active(shared),
             "elapsed_s": crate::longrec::elapsed_secs(shared),

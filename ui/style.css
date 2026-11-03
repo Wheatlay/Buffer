@@ -513,6 +513,12 @@ body { color: var(--text); }
 #nav .item.new::after, #nav .item.new:hover::after { content: ""; position: absolute; top: 9px; right: 11px; width: 6px; height: 6px;
   border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 2px var(--bg); animation: none; }
 #nav .item.new:not(.on) .ic { color: var(--text); }
+/* the page has something to fix (e.g. EQ not on the output that plays): an amber dot */
+#nav .item.warn::after, #nav .item.warn:hover::after { content: ""; position: absolute; top: 8px; right: 10px; width: 8px; height: 8px;
+  border-radius: 50%; background: #ffb454; box-shadow: 0 0 0 2px var(--bg); animation: none; }
+/* the module's own part is not installed: greyed until it is, still clickable */
+#nav .item.off:not(.on) { opacity: .4; }
+#nav .item.off:not(.on):hover { opacity: .75; }
 
 .ed { grid-template-columns: minmax(0, 1fr) 290px; }
 .edhead .backbtn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9px; background: var(--raised);

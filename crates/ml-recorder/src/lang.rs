@@ -71,6 +71,8 @@ static TABLE: &[(&str, [&str; 9])] = &[
     ("menu.open", ["Open editor", "Otwórz edytor", "Editor öffnen", "Abrir editor", "Ouvrir l'éditeur", "Відкрити редактор", "Düzenleyiciyi aç", "エディターを開く", "打开编辑器"]),
     ("pop.output", ["Output switched", "Zmieniono wyjście", "Ausgabe gewechselt", "Salida cambiada", "Sortie changée", "Вихід змінено", "Çıkış değişti", "出力を切り替えました", "已切换输出"]),
     ("mix.open", ["Open SoundSwitcher", "Otwórz SoundSwitcher", "SoundSwitcher öffnen", "Abrir SoundSwitcher", "Ouvrir SoundSwitcher", "Відкрити SoundSwitcher", "SoundSwitcher'ı aç", "SoundSwitcher を開く", "打开 SoundSwitcher"]),
+    ("pop.output_none", ["Nothing to switch to", "Nie ma na co przełączyć", "Nichts zum Wechseln", "No hay a qué cambiar", "Rien vers quoi basculer", "Немає на що перемкнути", "Geçilecek çıkış yok", "切り替え先がありません", "没有可切换的输出"]),
+    ("pop.output_none_sub", ["Pick outputs in SoundSwitcher", "Wybierz wyjścia w SoundSwitcher", "Ausgaben in SoundSwitcher wählen", "Elige salidas en SoundSwitcher", "Choisis les sorties dans SoundSwitcher", "Виберіть виходи в SoundSwitcher", "SoundSwitcher'da çıkış seç", "SoundSwitcherで出力を選択", "在 SoundSwitcher 中选择输出"]),
     ("pop.mic", ["Microphone switched", "Zmieniono mikrofon", "Mikrofon gewechselt", "Micrófono cambiado", "Micro changé", "Мікрофон змінено", "Mikrofon değişti", "マイクを切り替えました", "已切换麦克风"]),
     ("mix.system", ["System sounds", "Dźwięki systemowe", "Systemsounds", "Sonidos del sistema", "Sons système", "Системні звуки", "Sistem sesleri", "システム音", "系统声音"]),
     ("mix.drop",["Drop here", "Upuść tutaj", "Hier ablegen", "Suelta aquí", "Déposer ici", "Відпустіть тут", "Buraya bırak", "ここにドロップ", "放到这里"]),

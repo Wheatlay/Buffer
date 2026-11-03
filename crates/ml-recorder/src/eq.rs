@@ -211,7 +211,7 @@ pub fn command(shared: &Shared, cmd: &str, arg: &str) -> Value {
                 let c = shared.cfg.lock().unwrap();
                 (c.output_cycle.clone(), c.hidden_outputs.clone())
             };
-            crate::endpoints::cycle_output(&chosen, &hidden).map(|_| ())
+            crate::endpoints::cycle_output(&chosen, &hidden).map(|_| ()).map_err(|e| e.unwrap_or_else(|| "nothing to switch to".into()))
         } else {
             crate::endpoints::set_default_output(arg)
         } {

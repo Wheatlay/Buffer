@@ -587,8 +587,11 @@ fn switch_output(shared: &session::Shared) {
         let c = shared.cfg.lock().unwrap();
         (c.output_cycle.clone(), c.hidden_outputs.clone())
     };
-    if let Err(e) = crate::endpoints::cycle_output(&chosen, &hidden) {
-        session::log(&format!("output switch: {e}"));
+    match crate::endpoints::cycle_output(&chosen, &hidden) {
+        Ok(_) => {}
+        // a shortcut that does nothing looks broken: say why
+        Err(None) => shared.popup(Event::GameWarn, crate::lang::t("pop.output_none"), crate::lang::t("pop.output_none_sub")),
+        Err(Some(e)) => session::log(&format!("output switch: {e}")),
     }
     check_output(shared);
 }
@@ -894,6 +897,9 @@ pub fn run(shared: Arc<session::Shared>, _hotkey: String, popups: Receiver<Popup
             crate::eq::expire_solo(&tick_shared);
             // a switch made anywhere: popup, kept volume, EQ (cheap: the default endpoint and its volume)
             check_output(&tick_shared);
+            if tick % 10 == 0 {
+                crate::heal::check(&tick_shared);
+            }
             if tick % 4 == 0 {
                 crate::eq::follow_output(&tick_shared);
                 // the audio icon's picture follows a mute or volume change made elsewhere

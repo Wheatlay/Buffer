@@ -133,15 +133,25 @@ pub fn cycle_list(all: Vec<Endpoint>, cur: &str, comms: Option<&str>, chosen: &[
     if kept.len() >= 2 { kept } else { all }
 }
 
-/// Next output after the current default, wrapping around; returns its name.
-pub fn cycle_output(chosen: &[String], hidden: &[String]) -> Result<String, String> {
+/// Where the switch shortcut goes from `cur`: the next one in the list, or its first when `cur` is not in it (even
+/// a list of one: playing on a device outside the cycle, the shortcut still brings sound back into it).
+/// `None` = nowhere to go.
+pub fn next_in_cycle(list: &[Endpoint], cur: &str) -> Option<usize> {
+    match list.iter().position(|e| e.id == cur) {
+        Some(_) if list.len() < 2 => None,
+        Some(i) => Some((i + 1) % list.len()),
+        None if list.is_empty() => None,
+        None => Some(0),
+    }
+}
+
+/// Next output after the current default, wrapping around; returns its name. `Err(None)`: nothing to switch to
+/// (the caller tells the user), `Err(Some(e))`: Windows refused.
+pub fn cycle_output(chosen: &[String], hidden: &[String]) -> Result<String, Option<String>> {
     let cur = default_output().unwrap_or_default();
     let list = cycle_list(outputs(), &cur, default_comms_output().as_deref(), chosen, hidden);
-    if list.len() < 2 {
-        return Err("only one output device".into());
-    }
-    let i = list.iter().position(|e| e.id == cur).map(|i| (i + 1) % list.len()).unwrap_or(0);
-    set_default_output(&list[i].id)?;
+    let i = next_in_cycle(&list, &cur).ok_or(None)?;
+    set_default_output(&list[i].id).map_err(Some)?;
     Ok(list[i].name.clone())
 }
 
@@ -214,6 +224,16 @@ mod tests {
         assert_eq!(ids(super::cycle_list(all.clone(), "game", Some("chat"), &chosen(&["game", "chat"]), &[])), ["chat", "game"]);
         // an unplugged choice is skipped, never replaced by another device
         assert_eq!(ids(super::cycle_list(all, "game", None, &chosen(&["game", "usb"]), &[])), ["game"]);
+    }
+
+    #[test]
+    fn the_shortcut_leaves_a_device_outside_the_cycle() {
+        let one = vec![ep("monitor")];
+        // playing on the headset, only the monitor in the cycle (03.11.2026): go to the monitor
+        assert_eq!(super::next_in_cycle(&one, "headset"), Some(0));
+        assert_eq!(super::next_in_cycle(&one, "monitor"), None);
+        assert_eq!(super::next_in_cycle(&[], "monitor"), None);
+        assert_eq!(super::next_in_cycle(&[ep("a"), ep("b")], "b"), Some(0));
     }
 
     /// On a real machine: `cargo test -p ml-recorder endpoints -- --ignored --nocapture`. Re-applies the current

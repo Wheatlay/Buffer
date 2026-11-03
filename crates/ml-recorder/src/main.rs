@@ -5,6 +5,7 @@ mod away;
 mod config;
 mod endpoints;
 mod eq;
+mod heal;
 mod icons;
 mod identify;
 mod lang;

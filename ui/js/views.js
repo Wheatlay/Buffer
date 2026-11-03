@@ -157,8 +157,13 @@
       el.classList.toggle("on", on);
       const isMod = MODULES.includes(view);
       el.hidden = isMod && hidden.includes(view);
-      el.classList.toggle("new", isMod && !seen[view]);
-      el.title = isMod && !seen[view] ? App.t("nav.newTip") : "";
+      // from the recorder's status: a dot when the page has something to fix, grey when the module is not installed
+      const nav = (S.recorder && S.recorder.nav) || {}, warn = isMod && !!(nav.warn || {})[view], off = isMod && !!(nav.off || {})[view];
+      const fresh = isMod && !seen[view] && !warn;
+      el.classList.toggle("new", fresh);
+      el.classList.toggle("warn", warn);
+      el.classList.toggle("off", off && !warn);
+      el.title = warn ? App.t("nav.warn." + view) : off ? App.t("nav.off." + view) : fresh ? App.t("nav.newTip") : "";
       el.setAttribute("aria-label", label.replace("\n", ""));
       const lb = el.querySelector(".lb");
       if (lb.textContent !== label) lb.textContent = label;
@@ -296,6 +301,7 @@
     watchdog();
     paintRec();
     paintEq();
+    renderRail();
     // a clip the recorder just finished appears in the library without waiting for the window to regain focus
     const saved = S.recorder ? S.recorder.last_saved : "";
     if (Rec.lastSaved !== undefined && saved && saved !== Rec.lastSaved) {
