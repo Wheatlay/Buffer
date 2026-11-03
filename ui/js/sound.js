@@ -13,6 +13,7 @@
   let page = null, list = null, detail = null, opts = null, trayBox = null;
   let timer = 0, busy = false, shapeList = "", shapeDetail = "";
   let devs = [];
+  let displayAudio = false;         // an HDMI / DisplayPort output exists: show "keep HDMI awake"
   let sel = "";                     // device shown on the right
   const icons = new Map();          // icon source -> data URL ("" = none, null = loading)
   const waiting = new Map();        // icon source -> fill functions of the boxes waiting for it
@@ -356,6 +357,7 @@
       if (S.view !== "snd") return;
       if (!r || !r.ok) { noRecorder(); return; }
       devs = r.devices;
+      if (!!r.display_audio !== displayAudio) { displayAudio = !!r.display_audio; drawOpts(); }
       const hid = hiddenIds();
       if (!devs.some((d) => d.id === sel && (d.default || !hid.includes(d.id)))) sel = (devs.find((d) => d.default) || devs[0] || {}).id || "";
       const sl = JSON.stringify([hid, showHidden, devs.map((d) => [d.id, d.name, d.default, d.comms, appsText(d)])]);
@@ -398,7 +400,8 @@
       keyRow("key.mic", "key.micTip", "mic_hotkey", false),
       h("div", { class: "tgl" },
         toggle("snd.notify", "snd.notifyD", "output_popup", true),
-        toggle("snd.keepVol", "snd.keepVolD", "keep_volume", false)));
+        toggle("snd.keepVol", "snd.keepVolD", "keep_volume", false),
+        displayAudio ? toggle("snd.wake", "snd.wakeD", "wake_display_audio", true) : null));
   }
 
   document.addEventListener("visibilitychange", () => { if (!document.hidden && timer) poll(); });

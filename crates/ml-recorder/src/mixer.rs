@@ -291,7 +291,7 @@ pub fn command(shared: &crate::session::Shared, cmd: &str, arg: &str) -> serde_j
                     json!({ "id": d.id, "name": d.name, "default": d.default, "comms": d.comms, "volume": d.volume(), "muted": d.muted(), "peak": d.peak(), "apps": apps, "idle": idle })
                 })
                 .collect();
-            json!({ "ok": true, "devices": devs })
+            json!({ "ok": true, "devices": devs, "display_audio": crate::keepawake::present() })
         }
         // `mix-move {"app": key, "to": endpoint id}`: the app plays on that output from now on (the default one = unpin)
         "mix-move" => {

@@ -72,6 +72,8 @@ pub struct Config {
     pub audio_tray: bool,
     /// When the default output changes (from anywhere), the new one gets the volume the old one had.
     pub keep_volume: bool,
+    /// Plays inaudible zeros on HDMI / DisplayPort outputs so the monitor never drops the audio link (keepawake.rs).
+    pub wake_display_audio: bool,
     /// A popup naming the new default output whenever it changes (shortcut, flyout, Windows, plugging in).
     pub output_popup: bool,
     /// Makes the next microphone the Windows default (all roles); empty = none.
@@ -123,6 +125,7 @@ impl Default for Config {
             output_cycle: Vec::new(),
             audio_tray: true,
             keep_volume: false,
+            wake_display_audio: true,
             output_popup: true,
             mic_hotkey: String::new(),
             hidden_outputs: Vec::new(),

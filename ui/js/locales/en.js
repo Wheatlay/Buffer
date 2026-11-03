@@ -631,6 +631,8 @@ App.locales.en = { name: "English", tag: "en-US", ai: true, t: {
   "snd.notifyD": "On every device change",
   "snd.keepVol": "Keep the volume",
   "snd.keepVolD": "Across device changes",
+  "snd.wake": "Keep HDMI audio awake",
+  "snd.wakeD": "No lost first second on monitor speakers",
   "snd.hide": "Hide",
   "snd.hideTip": "Leave it out of the tray, the list and the shortcut",
   "snd.show": "Show",

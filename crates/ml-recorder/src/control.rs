@@ -126,6 +126,7 @@ fn needs_restart(old: &Config, new: &Config) -> bool {
         c.output_cycle.clear();
         c.audio_tray = true;
         c.keep_volume = false;
+        c.wake_display_audio = true;
         c.output_popup = true;
         c.mic_hotkey.clear();
         c.hidden_outputs.clear();

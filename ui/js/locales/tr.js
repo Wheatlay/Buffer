@@ -631,6 +631,8 @@ App.locales.tr = { name: "Türkçe", tag: "tr-TR", ai: true, t: {
   "snd.notifyD": "Her cihaz değişikliğinde",
   "snd.keepVol": "Ses seviyesini koru",
   "snd.keepVolD": "Cihaz değişince",
+  "snd.wake": "HDMI sesini açık tut",
+  "snd.wakeD": "Monitörde sesin başı kesilmez",
   "snd.hide": "Gizle",
   "snd.hideTip": "Tepside, listede ve kısayolda yok",
   "snd.show": "Göster",

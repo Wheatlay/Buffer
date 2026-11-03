@@ -631,6 +631,8 @@ App.locales.fr = { name: "Français", tag: "fr-FR", ai: true, t: {
   "snd.notifyD": "À chaque changement de périphérique",
   "snd.keepVol": "Garder le volume",
   "snd.keepVolD": "Au changement de périphérique",
+  "snd.wake": "Garder l'audio HDMI actif",
+  "snd.wakeD": "Pas de début coupé sur l'écran",
   "snd.hide": "Masquer",
   "snd.hideTip": "Absent de la zone de notification, de la liste et du raccourci",
   "snd.show": "Afficher",

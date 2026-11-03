@@ -631,6 +631,8 @@ App.locales.zh = { name: "简体中文", tag: "zh-CN", ai: true, t: {
   "snd.notifyD": "每次设备切换时",
   "snd.keepVol": "保持音量",
   "snd.keepVolD": "切换设备时",
+  "snd.wake": "保持 HDMI 音频唤醒",
+  "snd.wakeD": "显示器音频开头不丢失",
   "snd.hide": "隐藏",
   "snd.hideTip": "从托盘、列表和快捷键中移除",
   "snd.show": "显示",

@@ -636,6 +636,8 @@ App.locales.uk = { name: "Українська", tag: "uk-UA", ai: true, t: {
   "snd.notifyD": "При кожній зміні пристрою",
   "snd.keepVol": "Зберігати гучність",
   "snd.keepVolD": "При зміні пристрою",
+  "snd.wake": "Не присипляти HDMI",
+  "snd.wakeD": "Без тиші на початку звуку з монітора",
   "snd.hide": "Сховати",
   "snd.hideTip": "Немає в треї, списку й комбінації",
   "snd.show": "Показати",

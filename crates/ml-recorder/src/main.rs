@@ -13,6 +13,7 @@ mod mixer;
 mod appdev;
 mod flyout;
 mod input;
+mod keepawake;
 mod longrec;
 mod control;
 mod overlay;
@@ -221,6 +222,7 @@ fn run() {
     eq::init(&shared);
     rgb::init(&shared);
     fans::init();
+    keepawake::start(shared.clone());
     {
         let cfg = cfg.clone();
         std::thread::spawn(move || longrec::recover_orphans(&cfg));

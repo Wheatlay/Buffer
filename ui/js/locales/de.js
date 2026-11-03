@@ -631,6 +631,8 @@ App.locales.de = { name: "Deutsch", tag: "de-DE", ai: true, t: {
   "snd.notifyD": "Bei jedem Gerätewechsel",
   "snd.keepVol": "Lautstärke behalten",
   "snd.keepVolD": "Beim Gerätewechsel",
+  "snd.wake": "HDMI-Audio wach halten",
+  "snd.wakeD": "Kein verlorener Anfang über den Monitor",
   "snd.hide": "Ausblenden",
   "snd.hideTip": "Nicht im Tray, in der Liste und im Kürzel",
   "snd.show": "Zeigen",

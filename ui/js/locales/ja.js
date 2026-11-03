@@ -631,6 +631,8 @@ App.locales.ja = { name: "日本語", tag: "ja-JP", ai: true, t: {
   "snd.notifyD": "デバイスが変わるたびに",
   "snd.keepVol": "音量を引き継ぐ",
   "snd.keepVolD": "デバイス切り替え時",
+  "snd.wake": "HDMI音声を維持",
+  "snd.wakeD": "モニターで音の頭が切れない",
   "snd.hide": "隠す",
   "snd.hideTip": "トレイ、一覧、ショートカットから外す",
   "snd.show": "表示",

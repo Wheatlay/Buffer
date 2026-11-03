@@ -631,6 +631,8 @@ App.locales.pl = { name: "Polski", tag: "pl-PL", ai: false, t: {
   "snd.notifyD": "Przy każdej zmianie urządzenia",
   "snd.keepVol": "Zachowaj głośność",
   "snd.keepVolD": "Przy zmianie urządzenia",
+  "snd.wake": "Nie usypiaj HDMI",
+  "snd.wakeD": "Bez ciszy na starcie dźwięku z monitora",
   "snd.hide": "Ukryj",
   "snd.hideTip": "Znika z traya, listy i skrótu",
   "snd.show": "Pokaż",

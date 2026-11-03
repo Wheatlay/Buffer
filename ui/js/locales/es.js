@@ -631,6 +631,8 @@ App.locales.es = { name: "Español", tag: "es-ES", ai: true, t: {
   "snd.notifyD": "En cada cambio de dispositivo",
   "snd.keepVol": "Mantener el volumen",
   "snd.keepVolD": "Al cambiar de dispositivo",
+  "snd.wake": "Mantener HDMI activo",
+  "snd.wakeD": "Sin perder el inicio en el monitor",
   "snd.hide": "Ocultar",
   "snd.hideTip": "Fuera de la bandeja, la lista y el atajo",
   "snd.show": "Mostrar",
